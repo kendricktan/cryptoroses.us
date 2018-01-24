@@ -14,9 +14,16 @@ contract CryptoRoses {
 
   mapping (bytes32 => RoseOwner) roseOwners;
 
+  // Callback function
+  event ECheckGarlicTx(string txid);
+
   function CryptoRoses(bytes32 _name) public {
       owner = msg.sender;
       name = _name;
+  }
+
+  function checkGarlicTx(string txid) public {
+      ECheckGarlicTx(txid);
   }
 
   // 0.25 ETH (250000000000000000 wei) for a Gold Rose
