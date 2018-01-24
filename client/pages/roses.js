@@ -19,9 +19,10 @@ class Dapp extends React.Component {
 
   render () {
     const { balance = 'N/A' } = this.state
+    const { roseid } = this.props
     return (
       <div>
-        <h1>My Dapp</h1>
+        <h1>My Dapp @ { roseid }</h1>
 
         <button onClick={this.storeValue}>Store 5 into account balance</button>
         <button onClick={this.getValue}>Get account balance</button>
@@ -34,11 +35,11 @@ class Dapp extends React.Component {
   }
 }
 
-export default () => (
+export default ({ url: { query: { roseid } } }) => (
   <Web3Container
     renderLoading={() => <div>Loading Dapp Page...</div>}
     render={({ accounts, contract }) => (
-      <Dapp accounts={accounts} contract={contract} />
+      <Dapp accounts={accounts} contract={contract} roseid={roseid}/>
     )}
   />
 )
