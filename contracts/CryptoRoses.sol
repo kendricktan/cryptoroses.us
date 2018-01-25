@@ -13,17 +13,17 @@ contract CryptoRoses {
   }
 
   mapping (bytes32 => RoseOwner) roseOwners;
-
-  // Callback function
-  event ECheckGarlicTx(string txid);
+  mapping (address => bool) addrWhitelist;
 
   function CryptoRoses(bytes32 _name) public {
       owner = msg.sender;
       name = _name;
   }
 
-  function checkGarlicTx(string txid) public {
-      ECheckGarlicTx(txid);
+  function addAddWhitelist(address s) public {      
+      require(msg.sender == owner);
+
+      addrWhitelist[s] = true;
   }
 
   // 0.25 ETH (250000000000000000 wei) for a Gold Rose
@@ -47,7 +47,7 @@ contract CryptoRoses {
   function buyRoseETH(string memo) public payable {
       uint amntSent = msg.value;
       address sender = msg.sender;
-      bytes32 senderHash = sha256(sender);
+      bytes32 senderHash = keccak256(sender);
 
       Rose roseType;
 
@@ -81,9 +81,9 @@ contract CryptoRoses {
   uint constant GRLC_PINK_ROSE_PRICE = 4;
   uint constant GRLC_RED_ROSE_PRICE = 2;
 
-  function buyRoseGRLC(bytes32 gaddr, string memo, uint amntSent) public {
+  function buyRoseGRLC(bytes32 gaddrHash, string memo, uint amntSent) public {
       // Only a trusted oracle can call this function
-      require(msg.sender == owner);
+      require(addrWhitelist[msg.sender] || owner == msg.sender);
 
       Rose roseType;
 
@@ -101,14 +101,17 @@ contract CryptoRoses {
       }
 
       // No double buying roses
-      if (roseOwners[gaddr].hasRose) {          
+      if (roseOwners[gaddrHash].hasRose) {          
           return;
       }
 
-      roseOwners[gaddr].hasRose = true;
-      roseOwners[gaddr].roseType = roseType;
-      roseOwners[gaddr].memo = memo;
+      roseOwners[gaddrHash].hasRose = true;
+      roseOwners[gaddrHash].roseType = roseType;
+      roseOwners[gaddrHash].memo = memo;
   }
 
   // No refunds fam soz not soz
+  function checkRose(bytes32 h) public constant returns (bool, uint, string) {
+      return (roseOwners[h].hasRose, uint(roseOwners[h].roseType), roseOwners[h].memo);
+  }
 }
