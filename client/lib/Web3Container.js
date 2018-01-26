@@ -14,7 +14,7 @@ export default class Web3Container extends React.Component {
       const contract = await getContract(web3, contractDefinition)
       this.setState({ web3, accounts, contract })
     } catch (error) {
-      alert(`Failed to load web3, accounts, or contract. Check console for details.`)
+      alert(`Failed to load web3, accounts, or contract. Please unlock metamask or use the MIST browser.`)
       console.log(error)
     }
   }

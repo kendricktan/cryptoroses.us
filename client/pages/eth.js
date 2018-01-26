@@ -23,7 +23,9 @@ class RoseViaETH extends React.Component {
     })
     const ethPrice = this.getRoseETH(buyRoseType)
 
-    await contract.buyRoseETH(memo, { from: accounts[0], to: contract.address, value: web3.utils.toWei(ethPrice, 'ether') })
+    const buyResult = await contract.buyRoseETH(memo, { from: accounts[0], to: contract.address, value: web3.utils.toWei(ethPrice, 'ether') })
+
+    console.log(buyResult)
   }
 
   checkRose = async () => {
@@ -64,7 +66,7 @@ class RoseViaETH extends React.Component {
             ) :
             (
               <div>
-                <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: '#1e272e' }}>Attach a message alongside your Rose</h2>
+                <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: '#1e272e' }}>Purchase with ETH</h2>
 
                 {
                   buyRoseType === 'gold' ?
@@ -145,7 +147,7 @@ class RoseViaETH extends React.Component {
 export default () => (
   <div>
     <Web3Container
-      renderLoading={() => <div>Loading Dapp Page...</div>}
+      renderLoading={() => <div>Loading cryptoroses dapp...</div>}
       render={({ accounts, contract, web3 }) => (
         <RoseViaETH web3={web3} accounts={accounts} contract={contract} />
       )}

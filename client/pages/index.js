@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
 import BuyETH from './eth.js'
+import BuyGRLC from './grlc.js'
 import { Menu, Grid, Segment, Button } from 'semantic-ui-react'
 
 class HomeSegment extends React.Component {
@@ -67,7 +68,7 @@ class CryptoRosesTemplate extends React.Component {
                   (activeItem === 'buyViaETH') ?
                     <BuyETH /> :
                     (activeItem === 'buyViaGRLC') ?
-                      <p>Buy GRLC</p> :
+                      <BuyGRLC /> :
                       (activeItem === 'purchases') ?
                         <p>scan hash id</p> :
                         (activeItem === 'about') ?
