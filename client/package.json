@@ -9,13 +9,14 @@
     "start": "next start",
     "link-contracts": "cd lib && ln -s ../../build/contracts contracts"
   },
-  "dependencies": {
+  "dependencies": {    
     "next": "^4.1.4",
     "react": "^16.1.0",
     "react-dom": "^16.1.0",
     "semantic-ui-css": "^2.2.12",
     "semantic-ui-react": "^0.77.2",
     "truffle-contract": "^3.0.1",
+    "url-loader": "^0.6.2",
     "web3": "^1.0.0-beta.26"
   }
 }
