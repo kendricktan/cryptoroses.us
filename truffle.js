@@ -21,6 +21,11 @@ module.exports = {
       provider: new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/" + infura_apikey),
       gas: 900000
     },
+    mainnet: {
+      network_id: 1,
+      provider: new HDWalletProvider(mnemonic, "https://mainnet.infura.io/" + infura_apikey),
+      gas: 900000
+    },
   },
   solc: {
     // Turns on the Solidity optimizer. For development the optimizer's
