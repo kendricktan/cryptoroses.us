@@ -10,10 +10,11 @@
     "export": "next export",
     "link-contracts": "cd lib && ln -s ../../build/contracts contracts"
   },
-  "dependencies": {    
+  "dependencies": {
     "next": "^4.1.4",
     "react": "^16.1.0",
     "react-dom": "^16.1.0",
+    "react-ga": "^2.4.1",
     "semantic-ui-css": "^2.2.12",
     "semantic-ui-react": "^0.77.2",
     "truffle-contract": "^3.0.1",

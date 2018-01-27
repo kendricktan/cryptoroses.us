@@ -2,13 +2,17 @@ import axios from 'axios'
 import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
+import { initGA, logPageView } from './ga.js'
 import { Grid, Image } from 'semantic-ui-react'
 
 
 class CheckRose extends React.Component {
   state = { from: '', memo: '', to: '', roseType: -1, hasRose: false, hash: '', checkedHash: false }
 
-  componentDidMount = () => {
+  componentDidMount = () => {    
+    initGA()
+    logPageView()
+
     const { hash } = this.props
 
     this.setState({

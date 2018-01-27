@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Head from 'next/head'
 import BuyETH from './eth.js'
 import BuyGRLC from './grlc.js'
+import { initGA, logPageView } from './ga.js'
 import { Button, Form, Input, Menu, Grid, Segment, Image } from 'semantic-ui-react'
 
 class HomeSegment extends React.Component {
@@ -67,6 +68,11 @@ class CryptoRosesTemplate extends React.Component {
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
   handleButtonClick = ({ name }) => this.setState({ activeItem: name })
+
+  componentDidMount = () => {
+    initGA()
+    logPageView()
+  }
 
   render() {
     const { activeItem } = this.state
