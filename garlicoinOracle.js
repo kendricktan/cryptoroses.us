@@ -1,9 +1,25 @@
 const axios = require('axios')
 const RoseContract = require('./build/contracts/CryptoRoses.json')
 const contract = require('truffle-contract')
+const HDWalletProvider = require("truffle-hdwallet-provider");
+
+let web3provider = 'http://localhost:8545'
+
+const mnemonic = process.env.ETH_MNEMONIC_KEY;
+
+if (mnemonic === undefined) {
+  console.log('ETH_MNEMONIC_KEY env key not fonud, exiting...')
+  return
+}
+
+if (process.argv[2] === 'ropsten') web3provider = 'https://ropsten.infura.io/'
+else if (process.argv[2] === 'rinkeby') web3provider = 'https://rinkeby.infura.io/'
+else if (process.argv[2] === 'mainnet') web3provider = 'https://mainnet.infura.io/';
+
+console.log('Connected to ' + web3provider)
 
 const Web3 = require('web3')
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+const web3 = new Web3(new HDWalletProvider(mnemonic, web3provider));
 
 const express = require('express')
 const cors = require('cors')
@@ -85,14 +101,14 @@ web3.eth.getAccounts((err, accounts) => {
               return
             }
 
-            const haddress = web3.sha3(txid + '42isagreatnumber,no?')
+            const haddress = web3.sha3(txid + '42isagreatnumber,no?')            
 
             // Call contract
             roseInstance.buyRoseGRLC(haddress, memo, sendAmount, { from: accounts[0], gas: 900000 })
               .then((roseResult) => {
                 res.send({ 'hash': haddress })
               })
-              .catch((roseErr) => {
+              .catch((roseErr) => {                
                 res.status(400).send({ 'error': roseErr })
               })
           })

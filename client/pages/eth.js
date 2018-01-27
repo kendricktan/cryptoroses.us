@@ -16,6 +16,12 @@ class RoseViaETH extends React.Component {
   buyRose = () => {
     const { accounts, contract, web3 } = this.props
     const { sendMemo, sendFrom, sendTo, buyRoseType } = this.state
+
+    if (accounts[0] === undefined) {
+      alert('Unable to connect to web3, please unlock metamask or use the mist browser')
+      return
+    }
+
     const memo = JSON.stringify({
       memo: sendMemo,
       to: sendTo,
@@ -45,6 +51,11 @@ class RoseViaETH extends React.Component {
 
   checkRose = () => {
     const { accounts, contract, web3 } = this.props
+
+    if (accounts[0] === undefined) {      
+      return
+    }
+
     const hashRID = web3.utils.sha3(accounts[0])
 
     contract.checkRose.call(hashRID, { from: accounts[0] })

@@ -1,3 +1,8 @@
+var HDWalletProvider = require("truffle-hdwallet-provider");
+
+var infura_apikey = process.env.INFURA_API_KEY;
+var mnemonic = process.env.ETH_MNEMONIC_KEY;
+
 module.exports = {
   networks: {
     development: {
@@ -5,7 +10,17 @@ module.exports = {
       host: 'localhost',
       port: 8545,
       network_id: '*' // Match any network id
-    }
+    },
+    ropsten: {
+      network_id: 3,
+      provider: new HDWalletProvider(mnemonic, "https://ropsten.infura.io/" + infura_apikey),
+      gas: 900000
+    },
+    rinkeby: {
+      network_id: 4,
+      provider: new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/" + infura_apikey),
+      gas: 900000
+    },
   },
   solc: {
     // Turns on the Solidity optimizer. For development the optimizer's

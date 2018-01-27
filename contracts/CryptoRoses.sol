@@ -1,6 +1,7 @@
 pragma solidity ^0.4.17;
 
 contract CryptoRoses {
+  address constant DESTINATION_ADDRESS = 0x19Ed10db2960B9B21283FdFDe464e7bF3a87D05D;
   address owner;
   bytes32 name;
 
@@ -75,7 +76,7 @@ contract CryptoRoses {
       roseOwners[senderHash].roseType = roseType;
       roseOwners[senderHash].memo = memo;
 
-      owner.transfer(amntSent);
+      DESTINATION_ADDRESS.transfer(amntSent);
   }
 
   uint constant GRLC_GOLD_ROSE_PRICE = 50;
