@@ -3,23 +3,61 @@ import Link from 'next/link'
 import Head from 'next/head'
 import BuyETH from './eth.js'
 import BuyGRLC from './grlc.js'
-import { Menu, Grid, Segment, Button } from 'semantic-ui-react'
+import { Button, Form, Input, Menu, Grid, Segment } from 'semantic-ui-react'
 
 class HomeSegment extends React.Component {
   render() {
     return (
-      <Segment basic>
-        <div>
-          <div style={{ textAlign: 'center' }}>
-            <img src='//i.imgur.com/6Hrivqn.png' /><br />
-            <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: '#1e272e' }}>
-              Buy roses on the Ethereum blockchain via ETH or GRLC
-              </h2><br />
-            <Button basic color='violet' content='Buy with Ethereum (ETH)' onClick={() => this.props.handleButtonClick({ name: 'buyViaETH' })} />
-            <Button basic color='olive' content='Buy with Garlicoin (GRLC)' onClick={() => this.props.handleButtonClick({ name: 'buyViaGRLC' })} />
-          </div>
+      <div>
+        <div style={{ textAlign: 'center' }}>
+          <img src='//i.imgur.com/6Hrivqn.png' /><br />
+          <h2>
+            Buy roses on the Ethereum blockchain via ETH or GRLC
+          </h2><br />
+          <Button basic color='violet' content='Buy with Ethereum (ETH)' onClick={() => this.props.handleButtonClick({ name: 'buyViaETH' })} size='large' />
+          <Button basic color='olive' content='Buy with Garlicoin (GRLC)' onClick={() => this.props.handleButtonClick({ name: 'buyViaGRLC' })} size='large' />
         </div>
-      </Segment>
+      </div>
+    )
+  }
+}
+
+class PurchaseSegment extends React.Component {
+  state = { hash: '' }
+
+  render() {
+    const { hash } = this.state
+
+    return (
+      <Form>
+        <h2>
+          Enter your hash below to retrieve your purchase.
+        </h2>
+
+        <Form.Field>
+          <Input value={hash} onChange={(e) => this.setState({ hash: e.target.value })} fluid placeholder='hash' />
+        </Form.Field>
+
+        <Form.Field>
+          <Button
+            onClick={() => window.open('/check?hash=' + hash, '_blank')}
+            fluid basic color='blue'>Retrieve my purchase</Button>
+        </Form.Field>
+      </Form>
+    )
+  }
+}
+
+class AboutSegment extends React.Component {
+  render() {
+    return (
+      <p>
+        <h2>About</h2>
+        Cryptoroses is an online shop that allows you to buy yourself a virtual rose on the Ethereum blockchain using ETH or GRLC.
+        
+        <h3>Disclaimer</h3>
+        You are responsible for your own account, funds, and private keys. You are responsible for your own decisions. Cryptoroses is not responsible for your decisions, actions, or losses that result from using Cryptoroses. By using Cryptoroses, you acknowledge this and agree to these terms.
+      </p>
     )
   }
 }
@@ -40,13 +78,24 @@ class CryptoRosesTemplate extends React.Component {
             rel="stylesheet"
             href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.11/semantic.min.css"
           />
-          <link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
+          <link href="https://fonts.googleapis.com/css?family=Quantico" rel="stylesheet" />
+          <link rel='shortcut icon' type='image/x-icon' href='/static/favicon.ico' />
+          <title>cryptoroses.us | ETH and GRLC accepted</title>
         </Head>
+        <style jsx global>{`
+          html *{             
+             font-family: 'Quantico', sans-serif !important;
+          }
+
+          h2, h3, h4, h5, h6 {
+            color: '#1e272e' !important;
+          }
+        `}</style>
 
         <Grid columns='equal'>
           <Grid.Column></Grid.Column>
           <Grid.Column width={8}>
-            <Menu text pointing secondary size='massive' style={{ fontFamily: "'Open Sans', sans-serif" }}>
+            <Menu text pointing secondary size='massive'>
               <Menu.Item header>Cryptoroses.us</Menu.Item>
               <Menu.Menu position='right'>
                 <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
@@ -62,19 +111,21 @@ class CryptoRosesTemplate extends React.Component {
           <Grid columns='equal'>
             <Grid.Column></Grid.Column>
             <Grid.Column width={8}>
-              {
-                (activeItem === 'home') ?
-                  <HomeSegment handleButtonClick={this.handleButtonClick} /> :
-                  (activeItem === 'buyViaETH') ?
-                    <BuyETH /> :
-                    (activeItem === 'buyViaGRLC') ?
-                      <BuyGRLC /> :
-                      (activeItem === 'purchases') ?
-                        <p>scan hash id</p> :
-                        (activeItem === 'about') ?
-                          <p>about</p> :
-                          <p>How you end up here</p>
-              }
+              <Segment basic>
+                {
+                  (activeItem === 'home') ?
+                    <HomeSegment handleButtonClick={this.handleButtonClick} /> :
+                    (activeItem === 'buyViaETH') ?
+                      <BuyETH /> :
+                      (activeItem === 'buyViaGRLC') ?
+                        <BuyGRLC /> :
+                        (activeItem === 'purchases') ?
+                          <PurchaseSegment /> :
+                          (activeItem === 'about') ?
+                            <AboutSegment/> :
+                            <p>How you end up here</p>
+                }
+              </Segment>
             </Grid.Column>
             <Grid.Column></Grid.Column>
           </Grid>
@@ -86,14 +137,15 @@ class CryptoRosesTemplate extends React.Component {
           bottom: '0px',
           left: '0px',
           right: '0px',
-          marginBottom: '0px'
+          marginBottom: '0px',
+          backgroundColor: '#ffffff'
         }}>
           <Grid columns='equal'>
             <Grid.Column></Grid.Column>
             <Grid.Column width={8}>
               <hr />
               <div style={{ textAlign: 'right' }}>
-                <h4 style={{ fontFamily: "'Open Sans', sans-serif" }}>&copy; CRYPTOROSES.US 2018</h4>
+                <h5>&copy; CRYPTOROSES.US 2018</h5>
               </div>
             </Grid.Column>
             <Grid.Column></Grid.Column>

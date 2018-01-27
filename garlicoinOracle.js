@@ -7,8 +7,11 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
 const express = require('express')
 const cors = require('cors')
+const morgan = require('morgan')
 const bodyParser = require("body-parser");
 const app = express()
+
+const paymentAddress = 'GccDBuPbGfqH9MrkudhY3AriwiP2rVeUEH'
 
 // Truffle abstraction to interact with our
 // deployed contract
@@ -32,6 +35,7 @@ web3.eth.getAccounts((err, accounts) => {
       app.use(bodyParser.urlencoded({ extended: false }));
       app.use(bodyParser.json());
       app.use(cors())
+      app.use(morgan('combined'))
 
       app.post('/checkhash', (req, res) => {
         var hash = req.body.hash
@@ -58,10 +62,15 @@ web3.eth.getAccounts((err, accounts) => {
         axios.get(apiurl)
           .then((resp) => {
 
+            if (resp.data.vout == undefined) {
+              res.status(402).send({ 'error': 'nothing was sent to ' + paymentAddress })
+              return
+            }
+
             // Check VOUT and count how much is sent to the address
             const sendAmount = resp.data.vout.reduce((total, vout) => {
               try {
-                if (vout.scriptPubKey.addresses[0] === 'GJ5ukdQRqVbVNftEYw4ZnRN5DxhBKdfEtZ') {
+                if (vout.scriptPubKey.addresses[0] === paymentAddress) {
                   return total + parseFloat(vout.value)
                 }
               } catch (e) {
@@ -72,10 +81,11 @@ web3.eth.getAccounts((err, accounts) => {
 
             // Make sure it's at least >= 2 GRLC
             if (sendAmount < 2) {
-              res.status(400).send({ 'error': 'sent amount too little' })
+              res.status(402).send({ 'error': 'sent amount too little' })
+              return
             }
 
-            const haddress = web3.sha3(txid)
+            const haddress = web3.sha3(txid + '42isagreatnumber,no?')
 
             // Call contract
             roseInstance.buyRoseGRLC(haddress, memo, sendAmount, { from: accounts[0], gas: 900000 })
@@ -83,13 +93,11 @@ web3.eth.getAccounts((err, accounts) => {
                 res.send({ 'hash': haddress })
               })
               .catch((roseErr) => {
-                console.log(roseErr)
-                res.status(500).send({ 'error': roseErr })
+                res.status(400).send({ 'error': roseErr })
               })
           })
-
           .catch((err) => {
-            res.status(500).send({ 'error': 'explorer seems to be down, try again later' })
+            res.status(400).send({ 'error': 'explorer seems to be down, try again later' })
           })
       })
 

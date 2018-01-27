@@ -5,15 +5,15 @@ import Web3Container from '../lib/Web3Container'
 import { Image, Form, Segment, Button, TextArea, Input } from 'semantic-ui-react'
 
 class RoseViaETH extends React.Component {
-  state = { buyRoseType: 'white', sendFrom: '', sendTo: '', sendMemo: '', readMemo: '', readRoseType: -1, readHasRose: false, readHash: '' }
+  state = { buying: false, buySuccess: false, buyRoseType: null, sendFrom: '', sendTo: '', sendMemo: '', readMemo: '', readRoseType: -1, readHasRose: false, readHash: '' }
 
-  handleSelectedRoseChange = (e, { value }) => this.setState({ buyRoseType: value })
+  handleSelectedRoseChange = ({ roseType }) => this.setState({ buyRoseType: roseType })
 
   componentDidMount = () => {
     this.checkRose()
   }
 
-  buyRose = async () => {
+  buyRose = () => {
     const { accounts, contract, web3 } = this.props
     const { sendMemo, sendFrom, sendTo, buyRoseType } = this.state
     const memo = JSON.stringify({
@@ -22,24 +22,40 @@ class RoseViaETH extends React.Component {
       from: sendFrom
     })
     const ethPrice = this.getRoseETH(buyRoseType)
+    const hashRID = web3.utils.sha3(accounts[0])
 
-    const buyResult = await contract.buyRoseETH(memo, { from: accounts[0], to: contract.address, value: web3.utils.toWei(ethPrice, 'ether') })
+    this.setState({
+      buying: true
+    })
 
-    console.log(buyResult)
+    contract.buyRoseETH(memo, { from: accounts[0], to: contract.address, gasPrice: web3.utils.toWei('25', 'gwei'), value: web3.utils.toWei(ethPrice, 'ether') })
+      .then((resp) => {
+        this.setState({
+          buying: false,
+          readHasRose: true,
+          readHash: hashRID
+        })
+      })
+      .catch((err) => {
+        this.setState({
+          buying: false
+        })
+      })
   }
 
-  checkRose = async () => {
+  checkRose = () => {
     const { accounts, contract, web3 } = this.props
     const hashRID = web3.utils.sha3(accounts[0])
 
-    const response = await contract.checkRose.call(hashRID, { from: accounts[0] })
-
-    this.setState({
-      readHasRose: response[0],
-      readRoseType: response[1].c[0],
-      readMemo: response[2],
-      readHash: hashRID
-    })
+    contract.checkRose.call(hashRID, { from: accounts[0] })
+      .then((resp) => {
+        this.setState({
+          readHasRose: resp[0],
+          readRoseType: resp[1].c[0],
+          readMemo: resp[2],
+          readHash: hashRID
+        })
+      })
   }
 
   getRoseETH = (color) => {
@@ -51,7 +67,7 @@ class RoseViaETH extends React.Component {
 
   render() {
     const { contract, web3 } = this.props
-    const { readHasRose, readRoseType, readMemo, readHash, buyRoseType } = this.state
+    const { readHasRose, readRoseType, readMemo, readHash, buyRoseType, buying } = this.state
     const ethPrice = this.getRoseETH(buyRoseType)
 
     return (
@@ -60,82 +76,85 @@ class RoseViaETH extends React.Component {
           readHasRose ?
             (
               <div>
-                <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: '#1e272e' }}>It appears you already bought a rose :)</h2> <br/>                
+                <h2>Have fun with your new cryptorose :)</h2> <br />
                 <b>Hash</b>: <a href={'/check?hash=' + readHash}>{readHash}</a>
               </div>
             ) :
             (
               <div>
-                <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: '#1e272e' }}>Purchase with ETH</h2>
+                <h1>Purchase with ETH</h1>
 
                 {
-                  buyRoseType === 'gold' ?
-                    <Image src='//www.theforeverrose.com/media/dipped-roses/gold-rose-4.jpg' size='medium' centered /> :
-                    buyRoseType === 'white' ?
-                      <Image src='//www.doctorsja.com/wp-content/uploads/2013/06/small__2343714916.jpg' size='medium' centered /> :
-                      buyRoseType === 'pink' ?
-                        <Image src='//storiesthatmatter.files.wordpress.com/2014/10/pink-rose-1280x1024.jpg' size='medium' centered /> :
-                        <Image src='//www.fullblossomflorist.com/wp-content/uploads/2016/02/0000350_single-red-rose-600x600.jpeg' size='medium' centered />
-                } <br />
+                  buyRoseType === null ?
+                    (
+                      <div>
+                        <h2>1. Choose your rose type</h2>
+                        <div style={{ textAlign: 'center' }}>
+                          <Image.Group size='small'>
+                            <Button
+                              onClick={() => this.handleSelectedRoseChange({ roseType: 'gold' })}
+                              basic color='yellow'>
+                              <Image label='Gold (0.25 ETH)' fluid src='/static/gold_001.png' />
+                            </Button>
 
-                <Form>
-                  <Form.Group widths='equal' inline>
-                    <Form.Radio
-                      fluid
-                      label='Gold Rose'
-                      name='radioGroup'
-                      value='gold'
-                      checked={this.state.buyRoseType === 'gold'}
-                      onChange={this.handleSelectedRoseChange}
-                    />
-                    <Form.Radio
-                      fluid
-                      label='White Rose'
-                      name='radioGroup'
-                      value='white'
-                      checked={this.state.buyRoseType === 'white'}
-                      onChange={this.handleSelectedRoseChange}
-                    />
-                    <Form.Radio
-                      fluid
-                      label='Pink Rose'
-                      name='radioGroup'
-                      value='pink'
-                      checked={this.state.buyRoseType === 'pink'}
-                      onChange={this.handleSelectedRoseChange}
-                    />
-                    <Form.Radio
-                      fluid
-                      label='Red Rose'
-                      name='radioGroup'
-                      value='red'
-                      checked={this.state.buyRoseType === 'Red'}
-                      onChange={this.handleSelectedRoseChange}
-                    />
-                  </Form.Group>
+                            <Button
+                              onClick={() => this.handleSelectedRoseChange({ roseType: 'white' })}
+                              basic color='black'>
+                              <Image label='White (0.05 ETH)' fluid src='/static/white_001.png' />
+                            </Button>
 
-                  <Form.Field>
-                    <Input onChange={(e) => this.setState({ sendFrom: e.target.value })} fluid icon='send' placeholder='Sender name' />
-                  </Form.Field>
+                            <Button
+                              onClick={() => this.handleSelectedRoseChange({ roseType: 'pink' })}
+                              basic color='pink'>
+                              <Image label='Pink (0.02 ETH)' fluid src='/static/pink_002.png' />
+                            </Button>
 
-                  <Form.Field>
-                    <Input onChange={(e) => this.setState({ sendTo: e.target.value })} fluid icon='user' placeholder='Recipient name' />
-                  </Form.Field>
+                            <Button
+                              onClick={() => this.handleSelectedRoseChange({ roseType: 'red' })}
+                              basic color='red'>
+                              <Image label='Red (0.01 ETH)' fluid src='/static/red_001.png' />
+                            </Button>
+                          </Image.Group>
+                        </div>
+                      </div>
+                    ) :
+                    (
+                      <div>
+                        <h2>2. Enter your details.</h2>
+                        <Form>
+                          <Form.Field>
+                            <Input onChange={(e) => this.setState({ sendFrom: e.target.value })} fluid icon='send' placeholder='Sender name' />
+                          </Form.Field>
 
-                  <Form.Field>
-                    <TextArea placeholder='Memo: E.g. Lots of love' onChange={(e) => this.setState({ sendMemo: e.target.value })} />
-                  </Form.Field>
-                </Form>
+                          <Form.Field>
+                            <Input onChange={(e) => this.setState({ sendTo: e.target.value })} fluid icon='user' placeholder='Recipient name' />
+                          </Form.Field>
 
-                <br />
-                <Button
-                  onClick={this.buyRose}
-                  fluid
-                  basic
-                  color={buyRoseType === 'gold' ? 'yellow' : buyRoseType}>
-                  Buy {buyRoseType} rose ({ethPrice} ETH)
-                </Button>
-                <br />
+                          <Form.Field>
+                            <TextArea placeholder='Memo: E.g. Lots of love' onChange={(e) => this.setState({ sendMemo: e.target.value })} />
+                          </Form.Field>
+                        </Form>
+
+                        <br />
+                        <Button
+                          loading={buying}
+                          onClick={this.buyRose}
+                          fluid={true}
+                          basic
+                          color={buyRoseType === 'gold' ? 'yellow' : buyRoseType}>
+                          Buy {buyRoseType} rose ({ethPrice} ETH)
+                        </Button><br />
+                        <Button
+                          onClick={() => this.handleSelectedRoseChange({ roseType: null })}
+                          fluid={true}
+                          basic
+                          color='black'>
+                          Cancel
+                        </Button>
+                        <br />
+                      </div>
+                    )
+                }
               </div>
             )
         }

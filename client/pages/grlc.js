@@ -5,15 +5,83 @@ import Link from 'next/link'
 import { Label, Image, Button, Form, Input, TextArea } from 'semantic-ui-react'
 
 class RoseViaGRLC extends React.Component {
-  state = { buyingRose: false, buyRoseSuccess: false, buyRoseFailureReason: '', buyRoseFailed: false, buyRoseType: 'white', txid: '', memo: '', from: '', to: '', hash: '' }
+  state = {
+    checkedTxid: false,
+    checkingTxid: false,  
+    buyingRose: false,
+    buyRoseSuccess: false,
+    buyRoseFailureReason: '',
+    buyRoseFailed: false,
+    buyRoseType: null,
+    txid: '', memo: '', from: '', to: '', hash: ''
+  }
 
-  handleSelectedRoseChange = (e, { value }) => this.setState({ buyRoseType: value })
+  handleSelectedRoseChange = ({ roseType }) => this.setState({ buyRoseType: roseType })
 
   getRoseGRLC = (color) => {
     if (color === 'gold') return '50'
     else if (color === 'white') return '10'
     else if (color === 'pink') return '4'
-    else if (color === 'red') return '2'
+    else if (color === 'red') return '2'    
+  }
+
+  checkGRLCTxid = () => {    
+    const { txid, buyRoseType } = this.state
+    const buyGRLCPrice = parseFloat(this.getRoseGRLC(buyRoseType))
+    const url = 'https://explorer.grlc-bakery.fun/api/getrawtransaction?txid=' + txid + '&decrypt=1'
+
+    this.setState({
+      checkingTxid: true,
+      buyRoseFailed: false
+    })
+
+    axios.get(url)
+      .then((resp) => {
+        const data = resp.data
+
+        if (data.vout === undefined) {
+          this.setState({
+            buyRoseFailed: true,
+            checkingTxid: false,
+            buyRoseFailureReason: 'Invalid txid'
+          })
+          return
+        }
+
+        // Check VOUT and count how much is sent to the address
+        const sendAmount = data.vout.reduce((total, vout) => {
+          try {
+            if (vout.scriptPubKey.addresses[0] === 'GccDBuPbGfqH9MrkudhY3AriwiP2rVeUEH') {
+              return total + parseFloat(vout.value)
+            }
+          } catch (e) {
+            return total
+          }
+          return total
+        }, 0.0)
+
+        if (sendAmount < buyGRLCPrice) {
+          this.setState({
+            buyRoseFailed: true,
+            checkingTxid: false,            
+            buyRoseFailureReason: 'Insufficient GRLC sent. Expected: ' + buyGRLCPrice + ', received: ' + sendAmount
+          })
+          return;
+        }
+
+        this.setState({
+          buyRoseFailed: false,
+          checkingTxid: false,
+          checkedTxid: true
+        })
+      })
+      .catch((err) => {        
+        this.setState({
+          buyRoseFailed: true,
+          checkingTxid: false,
+          buyRoseFailureReason: 'Explorer seems to be down, please try again later'
+        })
+      })
   }
 
   buyRosesViaGRLC = async () => {
@@ -47,118 +115,140 @@ class RoseViaGRLC extends React.Component {
   }
 
   render() {
-    const { buyRoseType, buyingRose, buyRoseSuccess, buyRoseFailed, buyRoseFailureReason, hash } = this.state
+    const { checkingTxid, buyRoseType, buyingRose, buyRoseSuccess, buyRoseFailed, buyRoseFailureReason, checkedTxid, hash, to, from, memo } = this.state
     const buyGRLCPrice = this.getRoseGRLC(buyRoseType)
 
     return (
       buyRoseSuccess ?
         (
-          <div style={{ fontFamily: "'Open Sans', sans-serif" }}>
+          <div>
             <h2>Purchase successful!</h2>
             <h4>Bookmark link below to view your cryptorose.</h4>
             <b>Hash</b>: <a href={'/check?hash=' + hash}>{hash}</a>
           </div>
         ) :
         (
-          <div style={{ fontFamily: "'Open Sans', sans-serif" }}>
-            <Form>
-              <Form.Field>
-                <h2>Instructions to puchase with GRLC</h2>
-              </Form.Field>
+          <div>
+            <h1>Puchase with GRLC</h1>
 
-              <Form.Field>
-                <h4>1. Choose what kind of rose you want to purchase</h4>
-              </Form.Field>
+            {
+              buyRoseType === null ?
+                (
+                  <div>
+                    <h2>1. Choose your rose kind</h2>
 
-              {
-                buyRoseType === 'gold' ?
-                  <Image src='//www.theforeverrose.com/media/dipped-roses/gold-rose-4.jpg' size='medium' centered /> :
-                  buyRoseType === 'white' ?
-                    <Image src='//www.doctorsja.com/wp-content/uploads/2013/06/small__2343714916.jpg' size='medium' centered /> :
-                    buyRoseType === 'pink' ?
-                      <Image src='//storiesthatmatter.files.wordpress.com/2014/10/pink-rose-1280x1024.jpg' size='medium' centered /> :
-                      <Image src='//www.fullblossomflorist.com/wp-content/uploads/2016/02/0000350_single-red-rose-600x600.jpeg' size='medium' centered />
-              } <br />
+                    <div style={{ textAlign: 'center' }}>
+                      <Image.Group size='small'>
+                        <Button
+                          onClick={() => this.handleSelectedRoseChange({ roseType: 'gold' })}
+                          basic color='yellow'>
+                          <Image label='Gold (50 GRLC)' fluid src='/static/gold_001.png' />
+                        </Button>
 
-              <Form.Group widths='equal' inline>
-                <Form.Radio
-                  fluid='true'
-                  label='Gold Rose'
-                  name='radioGroup'
-                  value='gold'
-                  checked={this.state.buyRoseType === 'gold'}
-                  onChange={this.handleSelectedRoseChange}
-                />
-                <Form.Radio
-                  fluid='true'
-                  label='White Rose'
-                  name='radioGroup'
-                  value='white'
-                  checked={this.state.buyRoseType === 'white'}
-                  onChange={this.handleSelectedRoseChange}
-                />
-                <Form.Radio
-                  fluid='true'
-                  label='Pink Rose'
-                  name='radioGroup'
-                  value='pink'
-                  checked={this.state.buyRoseType === 'pink'}
-                  onChange={this.handleSelectedRoseChange}
-                />
-                <Form.Radio
-                  fluid='true'
-                  label='Red Rose'
-                  name='radioGroup'
-                  value='red'
-                  checked={this.state.buyRoseType === 'Red'}
-                  onChange={this.handleSelectedRoseChange}
-                />
-              </Form.Group>
+                        <Button
+                          onClick={() => this.handleSelectedRoseChange({ roseType: 'white' })}
+                          basic color='black'>
+                          <Image label='White (10 GRLC)' fluid src='/static/white_001.png' />
+                        </Button>
 
-              <Form.Field>
-                <h4>2. Send <i>{this.getRoseGRLC(buyRoseType)} GRLC</i> to the address <b>`GccDBuPbGfqH9MrkudhY3AriwiP2rVeUEH`</b></h4>
-              </Form.Field>
+                        <Button
+                          onClick={() => this.handleSelectedRoseChange({ roseType: 'pink' })}
+                          basic color='pink'>
+                          <Image label='Pink (4 GRLC)' fluid src='/static/pink_002.png' />
+                        </Button>
 
-              <Form.Field>
-                <h4>3. Paste the txid into the field below</h4>
-              </Form.Field>
+                        <Button
+                          onClick={() => this.handleSelectedRoseChange({ roseType: 'red' })}
+                          basic color='red'>
+                          <Image label='Red (2 GRLC)' fluid src='/static/red_001.png' />
+                        </Button>
+                      </Image.Group>
+                    </div>
+                  </div>
+                ) :
+                checkedTxid === false ?
+                  (
+                    <div>
+                      <Form>
+                        <Form.Field>
+                          <h2>2. Send <i>{this.getRoseGRLC(buyRoseType)} GRLC</i> to the address <b>`GccDBuPbGfqH9MrkudhY3AriwiP2rVeUEH`</b></h2>
+                        </Form.Field>
 
-              <Form.Field>
-                <Input onChange={(e) => this.setState({ txid: e.target.value })} fluid icon='ticket' placeholder='Transaction ID' />
-                {
-                  buyRoseFailed ?
-                  <Label basic color='red' pointing>{buyRoseFailureReason}</Label>:
-                  null
-                }                
-              </Form.Field>
+                        <Form.Field>
+                          <h2>3. Paste the txid into the field below</h2>
+                        </Form.Field>
 
-              <Form.Field>
-                <h4>4. Fill out the rest of the info below</h4>
-              </Form.Field>
+                        <Form.Field>
+                          <Input onChange={(e) => this.setState({ txid: e.target.value })} fluid icon='ticket' placeholder='Transaction ID' />
+                          {
+                            buyRoseFailed ?
+                              <Label basic color='red' pointing>{buyRoseFailureReason}</Label> :
+                              null
+                          }
+                        </Form.Field>
 
-              <Form.Field>
-                <Input onChange={(e) => this.setState({ to: e.target.value })} fluid icon='send' placeholder='Sender name' />
-              </Form.Field>
+                        <Form.Field>
+                          <Button
+                            loading={checkingTxid}
+                            onClick={this.checkGRLCTxid}
+                            basic fluid color={buyRoseType === 'gold' ? 'yellow' : buyRoseType}>Next</Button>
+                        </Form.Field>
 
-              <Form.Field>
-                <Input onChange={(e) => this.setState({ from: e.target.value })} fluid icon='user' placeholder='Recipient name' />
-              </Form.Field>
+                        <Form.Field>
+                          <Button fluid basic color='black'
+                            onClick={() => {
+                              this.setState({
+                                buyRoseType: null,
+                                checkedTxid: false
+                              })
+                            }}>Cancel</Button>
+                        </Form.Field>
+                      </Form>
+                    </div>
+                  ) :
+                  (
+                    <div>
+                      <Form>
+                        <Form.Field>
+                          <h2>4. Fill out the rest of the info below</h2>
+                        </Form.Field>
 
-              <Form.Field>
-                <TextArea placeholder='Memo: E.g. Lots of love' onChange={(e) => this.setState({ memo: e.target.value })} />
-              </Form.Field>
-            </Form>
+                        <Form.Field>
+                          <Input onChange={(e) => this.setState({ to: e.target.value })} value={to} fluid icon='send' placeholder='Sender name' />
+                        </Form.Field>
 
-            <br />
+                        <Form.Field>
+                          <Input onChange={(e) => this.setState({ from: e.target.value })} value={from} fluid icon='user' placeholder='Recipient name' />
+                        </Form.Field>
 
-            <Button
-              loading={buyingRose}
-              onClick={this.buyRosesViaGRLC}
-              fluid
-              basic
-              color={buyRoseType === 'gold' ? 'yellow' : buyRoseType}>
-              Buy {buyRoseType} rose ({buyGRLCPrice} GRLC)
-            </Button>
+                        <Form.Field>
+                          <TextArea placeholder='Memo: E.g. Lots of love' vlaue={memo} onChange={(e) => this.setState({ memo: e.target.value })} />
+                        </Form.Field>
+                      </Form>
+
+                      <br />
+
+                      <Button
+                        loading={buyingRose}
+                        onClick={this.buyRosesViaGRLC}
+                        fluid
+                        basic
+                        color={buyRoseType === 'gold' ? 'yellow' : buyRoseType}>
+                        Claim my {buyRoseType} rose! ({buyGRLCPrice} GRLC)
+                      </Button><br/>
+                      <Button fluid basic color='black'
+                        onClick={() => {
+                          this.setState({
+                            buyRoseType: null,
+                            checkedTxid: false
+                          })
+                        }}>Cancel</Button>
+                    </div>
+                  )
+            }
+
+
+
           </div>
         )
     )
@@ -166,7 +256,5 @@ class RoseViaGRLC extends React.Component {
 }
 
 export default () => (
-  <div>
-    <RoseViaGRLC />
-  </div>
+  <RoseViaGRLC />
 )
