@@ -82,13 +82,13 @@ class RoseViaETH extends React.Component {
             ) :
             (
               <div>
-                <h1>Purchase with ETH</h1>
+                <h1>Purchase with ETH</h1><br/>
 
                 {
                   buyRoseType === null ?
                     (
                       <div>
-                        <h2>1. Choose your rose type</h2>
+                        <h2>1. Choose your rose type</h2><br/>
                         <div style={{ textAlign: 'center' }}>
                           <Image.Group size='small'>
                             <Button

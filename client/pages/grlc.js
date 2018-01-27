@@ -129,13 +129,13 @@ class RoseViaGRLC extends React.Component {
         ) :
         (
           <div>
-            <h1>Puchase with GRLC</h1>
+            <h1>Puchase with GRLC</h1><br/>
 
             {
               buyRoseType === null ?
                 (
                   <div>
-                    <h2>1. Choose your rose kind</h2>
+                    <h2>1. Choose your rose kind</h2><br/>
 
                     <div style={{ textAlign: 'center' }}>
                       <Image.Group size='small'>
@@ -173,6 +173,8 @@ class RoseViaGRLC extends React.Component {
                         <Form.Field>
                           <h2>2. Send <i>{this.getRoseGRLC(buyRoseType)} GRLC</i> to the address <b>`GccDBuPbGfqH9MrkudhY3AriwiP2rVeUEH`</b></h2>
                         </Form.Field>
+
+                        <br/>
 
                         <Form.Field>
                           <h2>3. Paste the txid into the field below</h2>

@@ -3,14 +3,14 @@ import Link from 'next/link'
 import Head from 'next/head'
 import BuyETH from './eth.js'
 import BuyGRLC from './grlc.js'
-import { Button, Form, Input, Menu, Grid, Segment } from 'semantic-ui-react'
+import { Button, Form, Input, Menu, Grid, Segment, Image } from 'semantic-ui-react'
 
 class HomeSegment extends React.Component {
   render() {
     return (
       <div>
         <div style={{ textAlign: 'center' }}>
-          <img src='//i.imgur.com/6Hrivqn.png' /><br />
+          <Image src='/static/banner_cropped.png' size='small' centered/><br />
           <h2>
             Buy roses on the Ethereum blockchain via ETH or GRLC
           </h2><br />
@@ -53,7 +53,7 @@ class AboutSegment extends React.Component {
     return (
       <p>
         <h2>About</h2>
-        Cryptoroses is an online shop that allows you to buy yourself a virtual rose on the Ethereum blockchain using ETH or GRLC.
+        Cryptoroses is a web app that allows you to buy a virtual rose on the Ethereum blockchain using ETH or GRLC.
         
         <h3>Disclaimer</h3>
         You are responsible for your own account, funds, and private keys. You are responsible for your own decisions. Cryptoroses is not responsible for your decisions, actions, or losses that result from using Cryptoroses. By using Cryptoroses, you acknowledge this and agree to these terms.

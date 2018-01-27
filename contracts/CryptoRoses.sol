@@ -74,6 +74,8 @@ contract CryptoRoses {
       roseOwners[senderHash].hasRose = true;
       roseOwners[senderHash].roseType = roseType;
       roseOwners[senderHash].memo = memo;
+
+      owner.transfer(amntSent);
   }
 
   uint constant GRLC_GOLD_ROSE_PRICE = 50;
