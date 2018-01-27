@@ -26,7 +26,7 @@ class CheckRose extends React.Component {
 
   checkRose = async () => {
     const { hash } = this.state
-    const response = await axios.post('http://localhost:3001/checkhash', { hash })
+    const response = await axios.post('//oracle.cryptoroses.us/checkhash', { hash })
     const data = response.data
 
     if (data[0] === false) {
