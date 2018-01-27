@@ -213,6 +213,7 @@ class RoseViaGRLC extends React.Component {
                       <Form>
                         <Form.Field>
                           <h2>4. Fill out the rest of the info below</h2>
+                          <h4>(Please be patient, it takes a while to interact with the ETH blockchain)</h4><br/>
                         </Form.Field>
 
                         <Form.Field>
