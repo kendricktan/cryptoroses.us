@@ -135,12 +135,12 @@ class RoseViaETH extends React.Component {
                         <h4>(Please be patient, it takes a while to interact with the ETH blockchain)</h4><br/>
                         <Form>
                           <Form.Field>
-                            <Input onChange={(e) => this.setState({ sendFrom: e.target.value })} fluid icon='send' placeholder='Sender name' />
+                            <Input onChange={(e) => this.setState({ sendTo: e.target.value })} fluid icon='user' placeholder='To' />
                           </Form.Field>
 
                           <Form.Field>
-                            <Input onChange={(e) => this.setState({ sendTo: e.target.value })} fluid icon='user' placeholder='Recipient name' />
-                          </Form.Field>
+                            <Input onChange={(e) => this.setState({ sendFrom: e.target.value })} fluid icon='send' placeholder='From' />
+                          </Form.Field>                          
 
                           <Form.Field>
                             <TextArea placeholder='Memo: E.g. Lots of love' onChange={(e) => this.setState({ sendMemo: e.target.value })} />

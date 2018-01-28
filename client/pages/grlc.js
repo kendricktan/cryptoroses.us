@@ -217,11 +217,11 @@ class RoseViaGRLC extends React.Component {
                         </Form.Field>
 
                         <Form.Field>
-                          <Input onChange={(e) => this.setState({ to: e.target.value })} value={to} fluid icon='send' placeholder='Sender name' />
+                          <Input onChange={(e) => this.setState({ to: e.target.value })} value={to} fluid icon='send' placeholder='To' />
                         </Form.Field>
 
                         <Form.Field>
-                          <Input onChange={(e) => this.setState({ from: e.target.value })} value={from} fluid icon='user' placeholder='Recipient name' />
+                          <Input onChange={(e) => this.setState({ from: e.target.value })} value={from} fluid icon='user' placeholder='From' />
                         </Form.Field>
 
                         <Form.Field>
