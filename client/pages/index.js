@@ -149,9 +149,11 @@ class CryptoRosesTemplate extends React.Component {
           <Grid columns='equal'>
             <Grid.Column></Grid.Column>
             <Grid.Column width={8}>
-              <hr />
+              <hr />              
               <div style={{ textAlign: 'right' }}>
-                <h5>&copy; CRYPTOROSES.US 2018</h5>
+                <h5><a href='http://github.com/kendricktan/cryptoroses.us'>Source Code</a>&nbsp;|&nbsp;
+                Find us on <a href='https://www.stateofthedapps.com/dapps/cryptoroses'>stateofdapps.com</a>&nbsp;|&nbsp;
+                &copy; CRYPTOROSES.US 2018</h5>
               </div>
             </Grid.Column>
             <Grid.Column></Grid.Column>

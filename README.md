@@ -4,6 +4,8 @@
 
 This is a side project that I made simply because I wanted to make something that interacts with Garlicoin (GRLC).
 
+Example of purchased rose: https://cryptoroses.us/check?hash=0xacbc535fc764af0a8fd29a99cb74beda32c354fef7354eb84bd7f7a589748aaf
+
 ## Getting started
 
 1. Make sure you're using node v8.9.x
