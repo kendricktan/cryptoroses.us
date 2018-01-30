@@ -80,7 +80,7 @@ class CheckRose extends React.Component {
                           </div>
                         </div>
 
-                        <div style={{ height: '60%', display: 'grid', backgroundColor: '#E4F1FE' }}>
+                        <div style={{ padding: '25px', height: '60%', display: 'grid', backgroundColor: '#E4F1FE' }}>
                           <div style={{ margin: 'auto' }}>
                             <div><Image src={this.getRosePic(roseType)} size='small' centered /></div>
                             <h3>{memo}</h3>

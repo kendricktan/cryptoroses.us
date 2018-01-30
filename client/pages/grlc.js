@@ -90,7 +90,7 @@ class RoseViaGRLC extends React.Component {
 
     this.setState({ buyingRose: true })
 
-    axios.post('//oracle.cryptoroses.us/buyrosegrlc', {
+    axios.post('//oracle.cryptoroses.us/buyrosegrlc', {    
       memo: gMemo,
       txid
     })

@@ -101,18 +101,29 @@ web3.eth.getAccounts((err, accounts) => {
               return
             }
 
-            const haddress = web3.sha3(txid + '42isagreatnumber,no?')            
+            const haddress = web3.sha3(txid + '42isagreatnumber,no?')
 
-            // Call contract
-            roseInstance.buyRoseGRLC(haddress, memo, sendAmount, { from: accounts[0], gas: 900000 })
-              .then((roseResult) => {
-                res.send({ 'hash': haddress })
-              })
-              .catch((roseErr) => {                
-                res.status(400).send({ 'error': roseErr })
-              })
+            // Check if hash exists, if it exists then return it first
+            roseInstance.checkRose.call(haddress, { from: accounts[0] })
+              .then((resp) => {
+                if (resp[0]) {
+                  res.send({'hash': haddress})
+                }                
+
+                else {
+                  // Call contract
+                  roseInstance.buyRoseGRLC(haddress, memo, sendAmount, { from: accounts[0], gas: 900000 })
+                  .then((roseResult) => {
+                    res.send({ 'hash': haddress })
+                  })
+                  .catch((roseErr) => {                
+                    res.status(400).send({ 'error': roseErr })
+                  })
+                }
+              })            
           })
           .catch((err) => {
+            console.log(err)
             res.status(400).send({ 'error': 'explorer seems to be down, try again later' })
           })
       })
