@@ -72,7 +72,7 @@ web3.eth.getAccounts((err, accounts) => {
           res.status(400).send({ 'error': 'txid and memo field must be filled' })
         }
 
-        var apiurl = 'https://explorer.grlc-bakery.fun/api/getrawtransaction?txid=' + txid + '&decrypt=1'
+        var apiurl = 'https://garli.co.in/api/getrawtransaction?txid=' + txid + '&decrypt=1'
 
         // Call API to check how many GRLC they've sent
         axios.get(apiurl)

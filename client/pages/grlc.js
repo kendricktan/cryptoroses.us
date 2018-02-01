@@ -28,7 +28,7 @@ class RoseViaGRLC extends React.Component {
   checkGRLCTxid = () => {    
     const { txid, buyRoseType } = this.state
     const buyGRLCPrice = parseFloat(this.getRoseGRLC(buyRoseType))
-    const url = 'https://explorer.grlc-bakery.fun/api/getrawtransaction?txid=' + txid + '&decrypt=1'
+    const url = 'https://garli.co.in/api/getrawtransaction?txid=' + txid + '&decrypt=1'
 
     this.setState({
       checkingTxid: true,
